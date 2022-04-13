@@ -1,25 +1,20 @@
 package com.algaworks.algafood.domain.model
 
-import java.math.BigDecimal
 import javax.persistence.*
 
 @Entity
-class Restaurante(
+class Permissao(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
     val nome: String,
-    @Column(name = "taxa_frete")
-    val taxaFrete: BigDecimal,
-    @ManyToOne
-    val cozinha: Cozinha
+    val descricao: String
 ) {
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Restaurante
+        other as Permissao
 
         if (id != other.id) return false
 
