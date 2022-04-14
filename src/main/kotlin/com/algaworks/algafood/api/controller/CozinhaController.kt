@@ -33,4 +33,17 @@ class CozinhaController(
     fun adicionar(@RequestBody cozinha: Cozinha): Cozinha {
         return cozinhaRepository.salvar(cozinha)
     }
+
+    @PutMapping("/{id}")
+    fun atualizar(
+        @PathVariable id: Long,
+        @RequestBody cozinha: Cozinha
+    ): ResponseEntity<Cozinha> {
+        val cozinhaAtual = cozinhaRepository.buscar(id)
+        if (cozinhaAtual != null) {
+            return ResponseEntity.ok(cozinhaRepository.salvar(cozinha.copy(id = cozinhaAtual.id)))
+        }
+
+        return ResponseEntity.notFound().build()
+    }
 }
