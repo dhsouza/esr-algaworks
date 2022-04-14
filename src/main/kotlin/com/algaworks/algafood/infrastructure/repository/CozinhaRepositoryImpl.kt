@@ -3,6 +3,7 @@ package com.algaworks.algafood.infrastructure.repository
 import com.algaworks.algafood.domain.model.Cozinha
 import com.algaworks.algafood.domain.repository.CozinhaRepository
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
@@ -19,10 +20,12 @@ class CozinhaRepositoryImpl(
         return manager.find(Cozinha::class.java, id)
     }
 
+    @Transactional
     override fun salvar(cozinha: Cozinha): Cozinha {
         return manager.merge(cozinha)
     }
 
+    @Transactional
     override fun remover(id: Long) {
         val cozinha = buscar(id)
         manager.remove(cozinha)

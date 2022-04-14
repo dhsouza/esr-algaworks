@@ -2,6 +2,7 @@ package com.algaworks.algafood.api.controller
 
 import com.algaworks.algafood.domain.model.Cozinha
 import com.algaworks.algafood.domain.repository.CozinhaRepository
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -25,5 +26,11 @@ class CozinhaController(
         }
 
         return ResponseEntity.notFound().build()
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    fun adicionar(@RequestBody cozinha: Cozinha): Cozinha {
+        return cozinhaRepository.salvar(cozinha)
     }
 }

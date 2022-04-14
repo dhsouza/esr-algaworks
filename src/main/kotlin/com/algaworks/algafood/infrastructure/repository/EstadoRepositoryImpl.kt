@@ -3,6 +3,7 @@ package com.algaworks.algafood.infrastructure.repository
 import com.algaworks.algafood.domain.model.Estado
 import com.algaworks.algafood.domain.repository.EstadoRepository
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
@@ -19,10 +20,12 @@ class EstadoRepositoryImpl(
         return manager.find(Estado::class.java, id)
     }
 
+    @Transactional
     override fun salvar(estado: Estado): Estado {
         return manager.merge(estado)
     }
 
+    @Transactional
     override fun remover(id: Long) {
         val estado = buscar(id)
         manager.remove(estado)
