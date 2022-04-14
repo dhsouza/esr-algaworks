@@ -19,6 +19,11 @@ class CozinhaController(
     @GetMapping("/{cozinhaId}")
     fun buscar(@PathVariable cozinhaId: Long): ResponseEntity<Cozinha> {
         val cozinha = cozinhaRepository.buscar(cozinhaId)
-        return ResponseEntity.ok(cozinha)
+
+        if (cozinha != null) {
+            return ResponseEntity.ok(cozinha)
+        }
+
+        return ResponseEntity.notFound().build()
     }
 }
