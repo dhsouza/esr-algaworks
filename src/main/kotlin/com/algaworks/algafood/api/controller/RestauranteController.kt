@@ -46,13 +46,15 @@ class RestauranteController(
     fun atualizar(
         @PathVariable restauranteId: Long,
         @RequestBody restaurante: Restaurante
-    ): ResponseEntity<Restaurante> {
+    ): ResponseEntity<*> {
         val restauranteAtual = restauranteRepository.buscar(restauranteId)
-        if (restauranteAtual != null) {
-            return ResponseEntity.ok(cadastroRestauranteService.salvar(restaurante.copy(id = restauranteAtual.id)))
-        }
+            ?: return ResponseEntity.notFound().build<Restaurante>()
 
-        return ResponseEntity.notFound().build()
+        return try {
+            ResponseEntity.ok(cadastroRestauranteService.salvar(restaurante.copy(id = restauranteAtual.id)))
+        } catch (ex: EntidadeNaoEncontradaException) {
+            ResponseEntity.badRequest().body(ex.message)
+        }
     }
 
     @DeleteMapping("/{restauranteId}")
