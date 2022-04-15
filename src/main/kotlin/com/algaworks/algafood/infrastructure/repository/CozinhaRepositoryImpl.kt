@@ -2,6 +2,7 @@ package com.algaworks.algafood.infrastructure.repository
 
 import com.algaworks.algafood.domain.model.Cozinha
 import com.algaworks.algafood.domain.repository.CozinhaRepository
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
@@ -27,7 +28,7 @@ class CozinhaRepositoryImpl(
 
     @Transactional
     override fun remover(id: Long) {
-        val cozinha = buscar(id)
+        val cozinha = buscar(id) ?: throw EmptyResultDataAccessException(1)
         manager.remove(cozinha)
     }
 }
