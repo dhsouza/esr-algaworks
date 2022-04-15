@@ -17,7 +17,7 @@ class CozinhaRepositoryImpl(
         return manager.createQuery("from Cozinha", Cozinha::class.java).resultList
     }
 
-    override fun buscar(id: Long): Cozinha? {
+    override fun buscar(id: Long?): Cozinha? {
         return manager.find(Cozinha::class.java, id)
     }
 

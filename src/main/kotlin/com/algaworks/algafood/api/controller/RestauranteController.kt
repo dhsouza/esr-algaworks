@@ -4,8 +4,10 @@ import com.algaworks.algafood.domain.exceptions.EntidadeNaoEncontradaException
 import com.algaworks.algafood.domain.model.Restaurante
 import com.algaworks.algafood.domain.repository.RestauranteRepository
 import com.algaworks.algafood.domain.service.CadastroRestauranteService
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.util.ReflectionUtils
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -60,6 +62,33 @@ class RestauranteController(
             ResponseEntity.noContent().build()
         } catch (ex: EntidadeNaoEncontradaException) {
             ResponseEntity.notFound().build()
+        }
+    }
+
+    @PatchMapping("/{restauranteId}")
+    fun atualizarParcial(
+        @PathVariable restauranteId: Long,
+        @RequestBody campos: Map<String, Any>
+    ): ResponseEntity<*> {
+        val restauranteAtual = restauranteRepository.buscar(restauranteId)
+            ?: return ResponseEntity.notFound().build<Restaurante>()
+
+        merge(campos, restauranteAtual)
+
+        return atualizar(restauranteId, restauranteAtual)
+    }
+
+    private fun merge(dadosOrigem: Map<String, Any>, restauranteDestino: Restaurante) {
+        val restauranteOrigem = jacksonObjectMapper().convertValue(dadosOrigem, Restaurante::class.java)
+
+        dadosOrigem.forEach { (nome) ->
+            val field = ReflectionUtils.findField(Restaurante::class.java, nome)
+                ?: return@forEach
+            field.isAccessible = true
+
+            val novoValor = ReflectionUtils.getField(field, restauranteOrigem)
+
+            ReflectionUtils.setField(field, restauranteDestino, novoValor)
         }
     }
 }
