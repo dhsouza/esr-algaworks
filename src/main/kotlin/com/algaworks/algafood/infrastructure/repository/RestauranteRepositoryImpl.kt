@@ -16,7 +16,7 @@ class RestauranteRepositoryImpl(
         return manager.createQuery("from Restaurante", Restaurante::class.java).resultList
     }
 
-    override fun buscar(id: Long): Restaurante {
+    override fun buscar(id: Long): Restaurante? {
         return manager.find(Restaurante::class.java, id)
     }
 

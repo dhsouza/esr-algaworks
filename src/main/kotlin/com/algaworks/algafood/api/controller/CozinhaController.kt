@@ -45,7 +45,7 @@ class CozinhaController(
     ): ResponseEntity<Cozinha> {
         val cozinhaAtual = cozinhaRepository.buscar(cozinhaId)
         if (cozinhaAtual != null) {
-            return ResponseEntity.ok(cozinhaRepository.salvar(cozinha.copy(id = cozinhaAtual.id)))
+            return ResponseEntity.ok(cadastroCozinhaService.salvar(cozinha.copy(id = cozinhaAtual.id)))
         }
 
         return ResponseEntity.notFound().build()
@@ -56,7 +56,7 @@ class CozinhaController(
         return try {
             cadastroCozinhaService.excluir(cozinhaId)
             ResponseEntity.noContent().build()
-        } catch (ex: EntidadeNaoEncontradaException){
+        } catch (ex: EntidadeNaoEncontradaException) {
             ResponseEntity.notFound().build()
         } catch (ex: EntidadeEmUsoException) {
             ResponseEntity.badRequest().build()
