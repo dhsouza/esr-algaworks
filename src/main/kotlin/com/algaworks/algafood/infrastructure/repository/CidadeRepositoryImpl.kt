@@ -2,6 +2,7 @@ package com.algaworks.algafood.infrastructure.repository
 
 import com.algaworks.algafood.domain.model.Cidade
 import com.algaworks.algafood.domain.repository.CidadeRepository
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
@@ -16,7 +17,7 @@ class CidadeRepositoryImpl(
         return manager.createQuery("from Cidade", Cidade::class.java).resultList
     }
 
-    override fun buscar(id: Long): Cidade {
+    override fun buscar(id: Long): Cidade? {
         return manager.find(Cidade::class.java, id)
     }
 
@@ -27,7 +28,7 @@ class CidadeRepositoryImpl(
 
     @Transactional
     override fun remover(id: Long) {
-        val cidade = buscar(id)
+        val cidade = buscar(id) ?: throw EmptyResultDataAccessException(1)
         manager.remove(cidade)
     }
 }

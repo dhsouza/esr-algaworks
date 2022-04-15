@@ -1,6 +1,5 @@
 package com.algaworks.algafood.api.controller
 
-import com.algaworks.algafood.domain.exceptions.EntidadeEmUsoException
 import com.algaworks.algafood.domain.exceptions.EntidadeNaoEncontradaException
 import com.algaworks.algafood.domain.model.Restaurante
 import com.algaworks.algafood.domain.repository.RestauranteRepository
@@ -24,12 +23,9 @@ class RestauranteController(
     @GetMapping("/{restauranteId}")
     fun buscar(@PathVariable restauranteId: Long): ResponseEntity<Restaurante> {
         val restaurante = restauranteRepository.buscar(restauranteId)
+            ?: return ResponseEntity.notFound().build()
 
-        if (restaurante != null) {
-            return ResponseEntity.ok(restaurante)
-        }
-
-        return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(restaurante)
     }
 
     @PostMapping
@@ -64,8 +60,6 @@ class RestauranteController(
             ResponseEntity.noContent().build()
         } catch (ex: EntidadeNaoEncontradaException) {
             ResponseEntity.notFound().build()
-        } catch (ex: EntidadeEmUsoException) {
-            ResponseEntity.badRequest().build()
         }
     }
 }

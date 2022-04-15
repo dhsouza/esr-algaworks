@@ -2,6 +2,7 @@ package com.algaworks.algafood.infrastructure.repository
 
 import com.algaworks.algafood.domain.model.Estado
 import com.algaworks.algafood.domain.repository.EstadoRepository
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
@@ -16,7 +17,7 @@ class EstadoRepositoryImpl(
         return manager.createQuery("from Estado", Estado::class.java).resultList
     }
 
-    override fun buscar(id: Long): Estado {
+    override fun buscar(id: Long): Estado? {
         return manager.find(Estado::class.java, id)
     }
 
@@ -27,7 +28,7 @@ class EstadoRepositoryImpl(
 
     @Transactional
     override fun remover(id: Long) {
-        val estado = buscar(id)
+        val estado = buscar(id) ?: throw EmptyResultDataAccessException(1)
         manager.remove(estado)
     }
 }

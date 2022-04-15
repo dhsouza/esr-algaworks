@@ -2,6 +2,7 @@ package com.algaworks.algafood.infrastructure.repository
 
 import com.algaworks.algafood.domain.model.Permissao
 import com.algaworks.algafood.domain.repository.PermissaoRepository
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
@@ -16,7 +17,7 @@ class PermissaoRepositoryImpl(
         return manager.createQuery("from Permissao", Permissao::class.java).resultList
     }
 
-    override fun buscar(id: Long): Permissao {
+    override fun buscar(id: Long): Permissao? {
         return manager.find(Permissao::class.java, id)
     }
 
@@ -27,7 +28,7 @@ class PermissaoRepositoryImpl(
 
     @Transactional
     override fun remover(id: Long) {
-        val permissao = buscar(id)
+        val permissao = buscar(id) ?: throw EmptyResultDataAccessException(1)
         manager.remove(permissao)
     }
 }

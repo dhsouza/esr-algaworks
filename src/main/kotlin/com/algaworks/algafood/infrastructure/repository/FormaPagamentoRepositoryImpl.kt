@@ -2,6 +2,7 @@ package com.algaworks.algafood.infrastructure.repository
 
 import com.algaworks.algafood.domain.model.FormaPagamento
 import com.algaworks.algafood.domain.repository.FormaPagamentoRepository
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
@@ -16,7 +17,7 @@ class FormaPagamentoRepositoryImpl(
         return manager.createQuery("from FormaPagamento", FormaPagamento::class.java).resultList
     }
 
-    override fun buscar(id: Long): FormaPagamento {
+    override fun buscar(id: Long): FormaPagamento? {
         return manager.find(FormaPagamento::class.java, id)
     }
 
@@ -27,7 +28,7 @@ class FormaPagamentoRepositoryImpl(
 
     @Transactional
     override fun remover(id: Long) {
-        val formaPagamento = buscar(id)
+        val formaPagamento = buscar(id) ?: throw EmptyResultDataAccessException(1)
         manager.remove(formaPagamento)
     }
 }

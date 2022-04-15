@@ -24,12 +24,9 @@ class CozinhaController(
     @GetMapping("/{cozinhaId}")
     fun buscar(@PathVariable cozinhaId: Long): ResponseEntity<Cozinha> {
         val cozinha = cozinhaRepository.buscar(cozinhaId)
+            ?: return ResponseEntity.notFound().build()
 
-        if (cozinha != null) {
-            return ResponseEntity.ok(cozinha)
-        }
-
-        return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(cozinha)
     }
 
     @PostMapping
@@ -44,22 +41,20 @@ class CozinhaController(
         @RequestBody cozinha: Cozinha
     ): ResponseEntity<Cozinha> {
         val cozinhaAtual = cozinhaRepository.buscar(cozinhaId)
-        if (cozinhaAtual != null) {
-            return ResponseEntity.ok(cadastroCozinhaService.salvar(cozinha.copy(id = cozinhaAtual.id)))
-        }
+            ?: return ResponseEntity.notFound().build()
 
-        return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(cadastroCozinhaService.salvar(cozinha.copy(id = cozinhaAtual.id)))
     }
 
     @DeleteMapping("/{cozinhaId}")
-    fun remover(@PathVariable cozinhaId: Long): ResponseEntity<Cozinha> {
+    fun remover(@PathVariable cozinhaId: Long): ResponseEntity<*> {
         return try {
             cadastroCozinhaService.excluir(cozinhaId)
-            ResponseEntity.noContent().build()
+            ResponseEntity.noContent().build<Cozinha>()
         } catch (ex: EntidadeNaoEncontradaException) {
-            ResponseEntity.notFound().build()
+            ResponseEntity.notFound().build<Cozinha>()
         } catch (ex: EntidadeEmUsoException) {
-            ResponseEntity.badRequest().build()
+            ResponseEntity.badRequest().body(ex.message)
         }
     }
 }

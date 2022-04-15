@@ -2,6 +2,7 @@ package com.algaworks.algafood.infrastructure.repository
 
 import com.algaworks.algafood.domain.model.Restaurante
 import com.algaworks.algafood.domain.repository.RestauranteRepository
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
@@ -27,7 +28,7 @@ class RestauranteRepositoryImpl(
 
     @Transactional
     override fun remover(id: Long) {
-        val restaurante = buscar(id)
+        val restaurante = buscar(id) ?: throw EmptyResultDataAccessException(1)
         manager.remove(restaurante)
     }
 }
