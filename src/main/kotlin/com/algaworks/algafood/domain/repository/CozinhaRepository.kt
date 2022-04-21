@@ -1,11 +1,11 @@
 package com.algaworks.algafood.domain.repository
 
 import com.algaworks.algafood.domain.model.Cozinha
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Repository
 
-interface CozinhaRepository {
+@Repository
+interface CozinhaRepository: JpaRepository<Cozinha, Long> {
 
-    fun listar(): List<Cozinha>
-    fun buscar(id: Long?): Cozinha?
-    fun salvar(cozinha: Cozinha): Cozinha
-    fun remover(id: Long)
+//    fun consultarPorNome(nome: String): List<Cozinha>
 }

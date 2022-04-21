@@ -15,8 +15,11 @@ class CadastroRestauranteService(
 
     fun salvar(restaurante: Restaurante): Restaurante {
         val cozinhaId = restaurante.cozinha?.id
-        val cozinha = cozinhaRepository.buscar(cozinhaId)
-            ?: throw EntidadeNaoEncontradaException("Não existe cadastro de cozinha com código $cozinhaId")
+        val cozinha = cozinhaId?.let {
+            cozinhaRepository.findById(it).orElseThrow {
+                EntidadeNaoEncontradaException("Não existe cadastro de cozinha com código $cozinhaId")
+            }
+        }
 
         return restauranteRepository.salvar(restaurante.copy(cozinha = cozinha))
     }

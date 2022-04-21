@@ -18,12 +18,12 @@ class CozinhaController(
 
     @GetMapping
     fun listar(): List<Cozinha> {
-        return cozinhaRepository.listar()
+        return cozinhaRepository.findAll()
     }
 
     @GetMapping("/{cozinhaId}")
     fun buscar(@PathVariable cozinhaId: Long): ResponseEntity<Cozinha> {
-        val cozinha = cozinhaRepository.buscar(cozinhaId)
+        val cozinha = cozinhaRepository.findById(cozinhaId).orElseGet { null }
             ?: return ResponseEntity.notFound().build()
 
         return ResponseEntity.ok(cozinha)
@@ -40,7 +40,7 @@ class CozinhaController(
         @PathVariable cozinhaId: Long,
         @RequestBody cozinha: Cozinha
     ): ResponseEntity<Cozinha> {
-        val cozinhaAtual = cozinhaRepository.buscar(cozinhaId)
+        val cozinhaAtual = cozinhaRepository.findById(cozinhaId).orElseGet { null }
             ?: return ResponseEntity.notFound().build()
 
         return ResponseEntity.ok(cadastroCozinhaService.salvar(cozinha.copy(id = cozinhaAtual.id)))

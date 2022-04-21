@@ -81,13 +81,12 @@ class RestauranteController(
     private fun merge(dadosOrigem: Map<String, Any>, restauranteDestino: Restaurante) {
         val restauranteOrigem = jacksonObjectMapper().convertValue(dadosOrigem, Restaurante::class.java)
 
-        dadosOrigem.forEach { (nome) ->
-            val field = ReflectionUtils.findField(Restaurante::class.java, nome)
+        dadosOrigem.forEach { (nomePropriedade) ->
+            val field = ReflectionUtils.findField(Restaurante::class.java, nomePropriedade)
                 ?: return@forEach
             field.isAccessible = true
 
             val novoValor = ReflectionUtils.getField(field, restauranteOrigem)
-
             ReflectionUtils.setField(field, restauranteDestino, novoValor)
         }
     }
