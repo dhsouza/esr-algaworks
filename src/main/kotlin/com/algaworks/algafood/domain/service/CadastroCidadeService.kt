@@ -15,15 +15,16 @@ class CadastroCidadeService(
 
     fun salvar(cidade: Cidade): Cidade {
         val estadoId = cidade.estado.id
-        val estado = estadoRepository.buscar(estadoId)
-            ?: throw EntidadeNaoEncontradaException("Não existe cadastro de estado com código $estadoId")
+        val estado = estadoRepository.findById(estadoId).orElseThrow {
+            EntidadeNaoEncontradaException("Não existe cadastro de estado com código $estadoId")
+        }
 
-        return cidadeRepository.salvar(cidade.copy(estado = estado))
+        return cidadeRepository.save(cidade.copy(estado = estado))
     }
 
     fun excluir(cidadeId: Long) {
         try {
-            cidadeRepository.remover(cidadeId)
+            cidadeRepository.deleteById(cidadeId)
         } catch (ex: EmptyResultDataAccessException) {
             throw EntidadeNaoEncontradaException("Não existe um cadastro de estado com código $cidadeId")
         }

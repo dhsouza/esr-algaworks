@@ -17,12 +17,12 @@ class CidadeController(
 
     @GetMapping
     fun listar(): List<Cidade> {
-        return cidadeRepository.listar()
+        return cidadeRepository.findAll()
     }
 
     @GetMapping("/{cidadeId}")
     fun buscar(@PathVariable cidadeId: Long): ResponseEntity<Cidade> {
-        val cidade = cidadeRepository.buscar(cidadeId)
+        val cidade = cidadeRepository.findById(cidadeId).orElse(null)
             ?: return ResponseEntity.notFound().build()
 
         return ResponseEntity.ok(cidade)
@@ -43,7 +43,7 @@ class CidadeController(
         @PathVariable cidadeId: Long,
         @RequestBody cidade: Cidade
     ): ResponseEntity<*> {
-        val cidadeAtual = cidadeRepository.buscar(cidadeId)
+        val cidadeAtual = cidadeRepository.findById(cidadeId).orElse(null)
             ?: return ResponseEntity.notFound().build<Cidade>()
 
         return try {

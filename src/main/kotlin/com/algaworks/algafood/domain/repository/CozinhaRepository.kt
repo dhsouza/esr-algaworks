@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface CozinhaRepository: JpaRepository<Cozinha, Long> {
+interface CozinhaRepository : JpaRepository<Cozinha, Long> {
 
 //    fun consultarPorNome(nome: String): List<Cozinha>
 }

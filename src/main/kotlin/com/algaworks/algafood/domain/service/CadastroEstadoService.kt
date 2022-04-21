@@ -14,12 +14,12 @@ class CadastroEstadoService(
 ) {
 
     fun salvar(estado: Estado): Estado {
-        return estadoRepository.salvar(estado)
+        return estadoRepository.save(estado)
     }
 
     fun excluir(estadoId: Long) {
         try {
-            estadoRepository.remover(estadoId)
+            estadoRepository.deleteById(estadoId)
         } catch (ex: EmptyResultDataAccessException) {
             throw EntidadeNaoEncontradaException("Não existe um cadastro de estado com código $estadoId")
         } catch (ex: DataIntegrityViolationException) {

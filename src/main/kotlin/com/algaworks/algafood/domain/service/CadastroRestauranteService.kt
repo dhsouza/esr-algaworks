@@ -21,12 +21,12 @@ class CadastroRestauranteService(
             }
         }
 
-        return restauranteRepository.salvar(restaurante.copy(cozinha = cozinha))
+        return restauranteRepository.save(restaurante.copy(cozinha = cozinha))
     }
 
     fun excluir(restauranteId: Long) {
         try {
-            restauranteRepository.remover(restauranteId)
+            restauranteRepository.deleteById(restauranteId)
         } catch (ex: EmptyResultDataAccessException) {
             throw EntidadeNaoEncontradaException("Não existe um cadastro de restaurante com código $restauranteId")
         }

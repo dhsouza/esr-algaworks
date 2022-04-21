@@ -18,12 +18,12 @@ class EstadoController(
 
     @GetMapping
     fun listar(): List<Estado> {
-        return estadoRepository.listar()
+        return estadoRepository.findAll()
     }
 
     @GetMapping("/{estadoId}")
     fun buscar(@PathVariable estadoId: Long): ResponseEntity<Estado> {
-        val estado = estadoRepository.buscar(estadoId)
+        val estado = estadoRepository.findById(estadoId).orElse(null)
             ?: return ResponseEntity.notFound().build()
 
         return ResponseEntity.ok(estado)
@@ -40,7 +40,7 @@ class EstadoController(
         @PathVariable estadoId: Long,
         @RequestBody estado: Estado
     ): ResponseEntity<Estado> {
-        val estadoAtual = estadoRepository.buscar(estadoId)
+        val estadoAtual = estadoRepository.findById(estadoId).orElse(null)
             ?: return ResponseEntity.notFound().build()
 
         return ResponseEntity.ok(cadastroEstadoService.salvar(estado.copy(id = estadoAtual.id)))

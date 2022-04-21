@@ -1,11 +1,6 @@
 package com.algaworks.algafood.domain.repository
 
 import com.algaworks.algafood.domain.model.Restaurante
+import org.springframework.data.jpa.repository.JpaRepository
 
-interface RestauranteRepository {
-
-    fun listar(): List<Restaurante>
-    fun buscar(id: Long): Restaurante?
-    fun salvar(restaurante: Restaurante): Restaurante
-    fun remover(id: Long)
-}
+interface RestauranteRepository : JpaRepository<Restaurante, Long>
