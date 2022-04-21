@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository
 import java.math.BigDecimal
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
+import javax.persistence.criteria.Predicate
 
 
 @Repository
@@ -15,32 +16,27 @@ class RestauranteRepositoryImpl(
 ) : RestauranteRepositoryQueries {
 
     override fun find(nome: String?, taxaFreteInicial: BigDecimal?, taxaFreteFinal: BigDecimal?): List<Restaurante> {
-        val jpql = StringBuilder()
-        jpql.append("from Restaurante where 0 = 0 ")
+        val builder = manager.criteriaBuilder
+        val criteria = builder.createQuery(Restaurante::class.java)
+        val root = criteria.from(Restaurante::class.java)
 
-        val parametros = HashMap<String, Any>()
+        val predicates = mutableListOf<Predicate>()
 
-        if (!nome.isNullOrBlank()) {
-            jpql.append("and nome like :nome ")
-            parametros["nome"] = "%$nome%"
+        if (!nome.isNullOrEmpty()) {
+            predicates.add(builder.like(root.get("nome"), "%$nome%"))
         }
 
         if (taxaFreteInicial != null) {
-            jpql.append("and taxaFrete >= :taxaInicial ")
-            parametros["taxaInicial"] = taxaFreteInicial
+            predicates.add(builder.greaterThanOrEqualTo(root.get("taxaFrete"), taxaFreteInicial))
         }
 
         if (taxaFreteFinal != null) {
-            jpql.append("and taxaFrete <= :taxaFinal ")
-            parametros["taxaFinal"] = taxaFreteFinal
+            predicates.add(builder.lessThanOrEqualTo(root.get("taxaFrete"), taxaFreteFinal))
         }
 
-        val query = manager.createQuery(jpql.toString(), Restaurante::class.java)
+        criteria.where(*predicates.toTypedArray())
 
-        parametros.forEach { (chave, valor) ->
-            query.setParameter(chave, valor)
-        }
-
+        val query = manager.createQuery(criteria)
         return query.resultList
     }
 }
