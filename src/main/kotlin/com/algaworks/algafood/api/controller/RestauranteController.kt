@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.util.ReflectionUtils
 import org.springframework.web.bind.annotation.*
+import java.math.BigDecimal
 
 @RestController
 @RequestMapping("/restaurantes")
@@ -28,6 +29,11 @@ class RestauranteController(
             ?: return ResponseEntity.notFound().build()
 
         return ResponseEntity.ok(restaurante)
+    }
+
+    @GetMapping("/teste")
+    fun teste(nome: String?, taxaFreteInicial: BigDecimal?, taxaFreteFinal: BigDecimal?): List<Restaurante> {
+        return restauranteRepository.find(nome, taxaFreteInicial, taxaFreteFinal)
     }
 
     @PostMapping
