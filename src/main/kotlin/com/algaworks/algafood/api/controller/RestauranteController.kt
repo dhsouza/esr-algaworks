@@ -4,8 +4,6 @@ import com.algaworks.algafood.domain.exceptions.EntidadeNaoEncontradaException
 import com.algaworks.algafood.domain.model.Restaurante
 import com.algaworks.algafood.domain.repository.RestauranteRepository
 import com.algaworks.algafood.domain.service.CadastroRestauranteService
-import com.algaworks.algafood.infrastructure.repository.spec.RestauranteSpecs.Factory.comFreteGratis
-import com.algaworks.algafood.infrastructure.repository.spec.RestauranteSpecs.Factory.comNomeSemelhante
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -39,10 +37,8 @@ class RestauranteController(
     }
 
     @GetMapping("/com-frete-gratis")
-    fun restaurantesComFreteGratis(nome: String?, taxaFreteInicial: BigDecimal?, taxaFreteFinal: BigDecimal?): List<Restaurante> {
-        return restauranteRepository.findAll(
-            comNomeSemelhante(nome).and(comFreteGratis())
-        )
+    fun restaurantesComFreteGratis(nome: String?): List<Restaurante> {
+        return restauranteRepository.findComFreteGratis(nome)
     }
 
     @PostMapping
