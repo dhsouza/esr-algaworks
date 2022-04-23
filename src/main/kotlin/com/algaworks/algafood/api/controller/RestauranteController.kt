@@ -69,7 +69,9 @@ class RestauranteController(
             ResponseEntity.ok(cadastroRestauranteService.salvar(
                 restaurante.copy(
                     id = restauranteAtual.id,
-                    formasPagamento = restauranteAtual.formasPagamento
+                    formasPagamento = restauranteAtual.formasPagamento,
+                    endereco = restauranteAtual.endereco,
+                    dataCadastro = restauranteAtual.dataCadastro
                 )
             ))
         } catch (ex: EntidadeNaoEncontradaException) {
