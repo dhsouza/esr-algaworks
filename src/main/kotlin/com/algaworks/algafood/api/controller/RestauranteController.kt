@@ -66,15 +66,16 @@ class RestauranteController(
             ?: return ResponseEntity.notFound().build<Restaurante>()
 
         return try {
-            ResponseEntity.ok(cadastroRestauranteService.salvar(
-                restaurante.copy(
-                    id = restauranteAtual.id,
-                    formasPagamento = restauranteAtual.formasPagamento,
-                    endereco = restauranteAtual.endereco,
-                    dataCadastro = restauranteAtual.dataCadastro,
-                    produtos = restauranteAtual.produtos
-                )
-            ))
+            ResponseEntity.ok(
+                cadastroRestauranteService.salvar(
+                    restaurante.copy(
+                        id = restauranteAtual.id,
+                        formasPagamento = restauranteAtual.formasPagamento,
+                        endereco = restauranteAtual.endereco,
+                        dataCadastro = restauranteAtual.dataCadastro,
+                        produtos = restauranteAtual.produtos
+                    )
+                ))
         } catch (ex: EntidadeNaoEncontradaException) {
             ResponseEntity.badRequest().body(ex.message)
         }
