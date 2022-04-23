@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.util.ReflectionUtils
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
+import java.util.*
 
 @RestController
 @RequestMapping("/restaurantes")
@@ -39,6 +40,11 @@ class RestauranteController(
     @GetMapping("/com-frete-gratis")
     fun restaurantesComFreteGratis(nome: String?): List<Restaurante> {
         return restauranteRepository.findComFreteGratis(nome)
+    }
+
+    @GetMapping("/primeiro")
+    fun restaurantePrimeiro(): Optional<Restaurante> {
+        return restauranteRepository.buscarPrimeiro()
     }
 
     @PostMapping
