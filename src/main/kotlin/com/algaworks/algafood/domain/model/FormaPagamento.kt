@@ -7,5 +7,6 @@ data class FormaPagamento(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
+
     val descricao: String
 )

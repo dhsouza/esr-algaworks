@@ -7,5 +7,7 @@ data class Estado(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
+
     val nome: String
 )
+
