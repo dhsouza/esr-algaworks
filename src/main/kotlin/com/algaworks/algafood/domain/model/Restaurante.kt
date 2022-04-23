@@ -13,6 +13,8 @@ data class Restaurante(
     val taxaFrete: BigDecimal?,
     @ManyToOne
     val cozinha: Cozinha?,
+    @Embedded
+    val endereco: Endereco?,
     @ManyToMany
     @JoinTable(name = "restaurante_forma_pagamento",
         joinColumns = [JoinColumn(name = "restaurante_id")],
