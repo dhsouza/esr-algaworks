@@ -33,5 +33,8 @@ data class Restaurante(
     @JoinTable(name = "restaurante_forma_pagamento",
         joinColumns = [JoinColumn(name = "restaurante_id")],
         inverseJoinColumns = [JoinColumn(name = "forma_pagamento_id")])
-    val formasPagamento: List<FormaPagamento>?
+    val formasPagamento: List<FormaPagamento>?,
+    @JsonIgnore
+    @OneToMany(mappedBy = "restaurante")
+    val produtos: List<Produto>?
 )

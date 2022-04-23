@@ -71,7 +71,8 @@ class RestauranteController(
                     id = restauranteAtual.id,
                     formasPagamento = restauranteAtual.formasPagamento,
                     endereco = restauranteAtual.endereco,
-                    dataCadastro = restauranteAtual.dataCadastro
+                    dataCadastro = restauranteAtual.dataCadastro,
+                    produtos = restauranteAtual.produtos
                 )
             ))
         } catch (ex: EntidadeNaoEncontradaException) {
