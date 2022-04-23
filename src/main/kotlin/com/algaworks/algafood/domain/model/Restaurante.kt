@@ -18,8 +18,7 @@ data class Restaurante(
     @Column(name = "taxa_frete")
     val taxaFrete: BigDecimal?,
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "cozinha_id", nullable = false)
     val cozinha: Cozinha?,
 
