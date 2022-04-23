@@ -11,5 +11,5 @@ data class Cozinha(
     val nome: String?,
     @JsonIgnore
     @OneToMany(mappedBy = "cozinha")
-    val restaurantes: List<Restaurante>
+    val restaurantes: List<Restaurante>?
 )

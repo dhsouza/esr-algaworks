@@ -16,7 +16,7 @@ import java.util.*
 @RequestMapping("/restaurantes")
 class RestauranteController(
     private val restauranteRepository: RestauranteRepository,
-    private val cadastroRestauranteService: CadastroRestauranteService
+    private val cadastroRestauranteService: CadastroRestauranteService,
 ) {
 
     @GetMapping
@@ -60,13 +60,18 @@ class RestauranteController(
     @PutMapping("/{restauranteId}")
     fun atualizar(
         @PathVariable restauranteId: Long,
-        @RequestBody restaurante: Restaurante
+        @RequestBody restaurante: Restaurante,
     ): ResponseEntity<*> {
         val restauranteAtual = restauranteRepository.findById(restauranteId).orElse(null)
             ?: return ResponseEntity.notFound().build<Restaurante>()
 
         return try {
-            ResponseEntity.ok(cadastroRestauranteService.salvar(restaurante.copy(id = restauranteAtual.id)))
+            ResponseEntity.ok(cadastroRestauranteService.salvar(
+                restaurante.copy(
+                    id = restauranteAtual.id,
+                    formasPagamento = restauranteAtual.formasPagamento
+                )
+            ))
         } catch (ex: EntidadeNaoEncontradaException) {
             ResponseEntity.badRequest().body(ex.message)
         }
@@ -85,7 +90,7 @@ class RestauranteController(
     @PatchMapping("/{restauranteId}")
     fun atualizarParcial(
         @PathVariable restauranteId: Long,
-        @RequestBody campos: Map<String, Any>
+        @RequestBody campos: Map<String, Any>,
     ): ResponseEntity<*> {
         val restauranteAtual = restauranteRepository.findById(restauranteId).orElse(null)
             ?: return ResponseEntity.notFound().build<Restaurante>()
