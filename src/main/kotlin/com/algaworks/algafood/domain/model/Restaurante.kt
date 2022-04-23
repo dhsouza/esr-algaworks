@@ -12,5 +12,10 @@ data class Restaurante(
     @Column(name = "taxa_frete")
     val taxaFrete: BigDecimal?,
     @ManyToOne
-    val cozinha: Cozinha?
+    val cozinha: Cozinha?,
+    @ManyToMany
+    @JoinTable(name = "restaurante_forma_pagamento",
+        joinColumns = [JoinColumn(name = "restaurante_id")],
+        inverseJoinColumns = [JoinColumn(name = "forma_pagamento_id")])
+    val formasPagamento: List<FormaPagamento>
 )
