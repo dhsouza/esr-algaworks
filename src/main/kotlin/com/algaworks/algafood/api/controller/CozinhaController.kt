@@ -1,7 +1,5 @@
 package com.algaworks.algafood.api.controller
 
-import com.algaworks.algafood.domain.exceptions.EntidadeEmUsoException
-import com.algaworks.algafood.domain.exceptions.EntidadeNaoEncontradaException
 import com.algaworks.algafood.domain.model.Cozinha
 import com.algaworks.algafood.domain.repository.CozinhaRepository
 import com.algaworks.algafood.domain.service.CadastroCozinhaService
@@ -47,14 +45,8 @@ class CozinhaController(
     }
 
     @DeleteMapping("/{cozinhaId}")
-    fun remover(@PathVariable cozinhaId: Long): ResponseEntity<*> {
-        return try {
-            cadastroCozinhaService.excluir(cozinhaId)
-            ResponseEntity.noContent().build<Cozinha>()
-        } catch (ex: EntidadeNaoEncontradaException) {
-            ResponseEntity.notFound().build<Cozinha>()
-        } catch (ex: EntidadeEmUsoException) {
-            ResponseEntity.badRequest().body(ex.message)
-        }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun remover(@PathVariable cozinhaId: Long) {
+        cadastroCozinhaService.excluir(cozinhaId)
     }
 }
