@@ -31,4 +31,10 @@ class CadastroRestauranteService(
             throw EntidadeNaoEncontradaException("Não existe um cadastro de restaurante com código $restauranteId")
         }
     }
+
+    fun buscarOuFalhar(restauranteId: Long): Restaurante {
+        return restauranteRepository.findById(restauranteId).orElseThrow {
+            EntidadeNaoEncontradaException("Não existe um cadastro de restaurante com código $restauranteId")
+        }
+    }
 }

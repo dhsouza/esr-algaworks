@@ -1,11 +1,9 @@
 package com.algaworks.algafood.api.controller
 
-import com.algaworks.algafood.domain.exceptions.EntidadeNaoEncontradaException
 import com.algaworks.algafood.domain.model.Cidade
 import com.algaworks.algafood.domain.repository.CidadeRepository
 import com.algaworks.algafood.domain.service.CadastroCidadeService
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -21,45 +19,29 @@ class CidadeController(
     }
 
     @GetMapping("/{cidadeId}")
-    fun buscar(@PathVariable cidadeId: Long): ResponseEntity<Cidade> {
-        val cidade = cidadeRepository.findById(cidadeId).orElse(null)
-            ?: return ResponseEntity.notFound().build()
-
-        return ResponseEntity.ok(cidade)
+    fun buscar(@PathVariable cidadeId: Long): Cidade {
+        return cadastroCidadeService.buscarOuFalhar(cidadeId)
     }
 
     @PostMapping
-    fun adicionar(@RequestBody cidadeRequest: Cidade): ResponseEntity<*> {
-        return try {
-            val cidade = cadastroCidadeService.salvar(cidadeRequest)
-            ResponseEntity.status(HttpStatus.CREATED).body(cidade)
-        } catch (ex: EntidadeNaoEncontradaException) {
-            ResponseEntity.badRequest().body(ex.message)
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    fun adicionar(@RequestBody cidadeRequest: Cidade): Cidade {
+        return cadastroCidadeService.salvar(cidadeRequest)
     }
 
     @PutMapping("/{cidadeId}")
     fun atualizar(
         @PathVariable cidadeId: Long,
         @RequestBody cidade: Cidade
-    ): ResponseEntity<*> {
-        val cidadeAtual = cidadeRepository.findById(cidadeId).orElse(null)
-            ?: return ResponseEntity.notFound().build<Cidade>()
+    ): Cidade {
+        val cidadeAtual = cadastroCidadeService.buscarOuFalhar(cidadeId)
 
-        return try {
-            ResponseEntity.ok(cadastroCidadeService.salvar(cidade.copy(id = cidadeAtual.id)))
-        } catch (ex: EntidadeNaoEncontradaException) {
-            ResponseEntity.badRequest().body(ex.message)
-        }
+        return cadastroCidadeService.salvar(cidade.copy(id = cidadeAtual.id))
     }
 
     @DeleteMapping("/{cidadeId}")
-    fun remover(@PathVariable cidadeId: Long): ResponseEntity<Cidade> {
-        return try {
-            cadastroCidadeService.excluir(cidadeId)
-            ResponseEntity.noContent().build()
-        } catch (ex: EntidadeNaoEncontradaException) {
-            ResponseEntity.notFound().build()
-        }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun remover(@PathVariable cidadeId: Long) {
+        cadastroCidadeService.excluir(cidadeId)
     }
 }

@@ -26,4 +26,10 @@ class CadastroEstadoService(
             throw EntidadeEmUsoException("Estado de código $estadoId não pode ser removida, pois está em uso")
         }
     }
+
+    fun buscarOuFalhar(estadoId: Long): Estado {
+        return estadoRepository.findById(estadoId).orElseThrow {
+            EntidadeNaoEncontradaException("Não existe um cadastro de estado com código $estadoId")
+        }
+    }
 }

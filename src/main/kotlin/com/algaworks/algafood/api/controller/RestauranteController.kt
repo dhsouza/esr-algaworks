@@ -1,12 +1,10 @@
 package com.algaworks.algafood.api.controller
 
-import com.algaworks.algafood.domain.exceptions.EntidadeNaoEncontradaException
 import com.algaworks.algafood.domain.model.Restaurante
 import com.algaworks.algafood.domain.repository.RestauranteRepository
 import com.algaworks.algafood.domain.service.CadastroRestauranteService
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.util.ReflectionUtils
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
@@ -25,11 +23,8 @@ class RestauranteController(
     }
 
     @GetMapping("/{restauranteId}")
-    fun buscar(@PathVariable restauranteId: Long): ResponseEntity<Restaurante> {
-        val restaurante = restauranteRepository.findById(restauranteId).orElse(null)
-            ?: return ResponseEntity.notFound().build()
-
-        return ResponseEntity.ok(restaurante)
+    fun buscar(@PathVariable restauranteId: Long): Restaurante {
+        return cadastroRestauranteService.buscarOuFalhar(restauranteId)
     }
 
     @GetMapping("/teste")
@@ -48,56 +43,41 @@ class RestauranteController(
     }
 
     @PostMapping
-    fun adicionar(@RequestBody restauranteRequest: Restaurante): ResponseEntity<*> {
-        return try {
-            val restaurante = cadastroRestauranteService.salvar(restauranteRequest)
-            ResponseEntity.status(HttpStatus.CREATED).body(restaurante)
-        } catch (ex: EntidadeNaoEncontradaException) {
-            ResponseEntity.badRequest().body(ex.message)
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    fun adicionar(@RequestBody restauranteRequest: Restaurante): Restaurante {
+        return cadastroRestauranteService.salvar(restauranteRequest)
     }
 
     @PutMapping("/{restauranteId}")
     fun atualizar(
         @PathVariable restauranteId: Long,
         @RequestBody restaurante: Restaurante,
-    ): ResponseEntity<*> {
-        val restauranteAtual = restauranteRepository.findById(restauranteId).orElse(null)
-            ?: return ResponseEntity.notFound().build<Restaurante>()
+    ): Restaurante {
+        val restauranteAtual = cadastroRestauranteService.buscarOuFalhar(restauranteId)
 
-        return try {
-            ResponseEntity.ok(
-                cadastroRestauranteService.salvar(
-                    restaurante.copy(
-                        id = restauranteAtual.id,
-                        formasPagamento = restauranteAtual.formasPagamento,
-                        endereco = restauranteAtual.endereco,
-                        dataCadastro = restauranteAtual.dataCadastro,
-                        produtos = restauranteAtual.produtos
-                    )
-                ))
-        } catch (ex: EntidadeNaoEncontradaException) {
-            ResponseEntity.badRequest().body(ex.message)
-        }
+        return cadastroRestauranteService.salvar(
+            restaurante.copy(
+                id = restauranteAtual.id,
+                formasPagamento = restauranteAtual.formasPagamento,
+                endereco = restauranteAtual.endereco,
+                dataCadastro = restauranteAtual.dataCadastro,
+                produtos = restauranteAtual.produtos
+            )
+        )
     }
 
     @DeleteMapping("/{restauranteId}")
-    fun remover(@PathVariable restauranteId: Long): ResponseEntity<Restaurante> {
-        return try {
-            cadastroRestauranteService.excluir(restauranteId)
-            ResponseEntity.noContent().build()
-        } catch (ex: EntidadeNaoEncontradaException) {
-            ResponseEntity.notFound().build()
-        }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun remover(@PathVariable restauranteId: Long) {
+        cadastroRestauranteService.excluir(restauranteId)
     }
 
     @PatchMapping("/{restauranteId}")
     fun atualizarParcial(
         @PathVariable restauranteId: Long,
         @RequestBody campos: Map<String, Any>,
-    ): ResponseEntity<*> {
-        val restauranteAtual = restauranteRepository.findById(restauranteId).orElse(null)
-            ?: return ResponseEntity.notFound().build<Restaurante>()
+    ): Restaurante {
+        val restauranteAtual = cadastroRestauranteService.buscarOuFalhar(restauranteId)
 
         merge(campos, restauranteAtual)
 

@@ -1,12 +1,9 @@
 package com.algaworks.algafood.api.controller
 
-import com.algaworks.algafood.domain.exceptions.EntidadeEmUsoException
-import com.algaworks.algafood.domain.exceptions.EntidadeNaoEncontradaException
 import com.algaworks.algafood.domain.model.Estado
 import com.algaworks.algafood.domain.repository.EstadoRepository
 import com.algaworks.algafood.domain.service.CadastroEstadoService
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -22,11 +19,8 @@ class EstadoController(
     }
 
     @GetMapping("/{estadoId}")
-    fun buscar(@PathVariable estadoId: Long): ResponseEntity<Estado> {
-        val estado = estadoRepository.findById(estadoId).orElse(null)
-            ?: return ResponseEntity.notFound().build()
-
-        return ResponseEntity.ok(estado)
+    fun buscar(@PathVariable estadoId: Long): Estado {
+        return cadastroEstadoService.buscarOuFalhar(estadoId)
     }
 
     @PostMapping
@@ -39,22 +33,15 @@ class EstadoController(
     fun atualizar(
         @PathVariable estadoId: Long,
         @RequestBody estado: Estado
-    ): ResponseEntity<Estado> {
-        val estadoAtual = estadoRepository.findById(estadoId).orElse(null)
-            ?: return ResponseEntity.notFound().build()
+    ): Estado {
+        val estadoAtual = cadastroEstadoService.buscarOuFalhar(estadoId)
 
-        return ResponseEntity.ok(cadastroEstadoService.salvar(estado.copy(id = estadoAtual.id)))
+        return cadastroEstadoService.salvar(estado.copy(id = estadoAtual.id))
     }
 
     @DeleteMapping("/{estadoId}")
-    fun remover(@PathVariable estadoId: Long): ResponseEntity<*> {
-        return try {
-            cadastroEstadoService.excluir(estadoId)
-            ResponseEntity.noContent().build<Estado>()
-        } catch (ex: EntidadeNaoEncontradaException) {
-            ResponseEntity.notFound().build<Estado>()
-        } catch (ex: EntidadeEmUsoException) {
-            ResponseEntity.badRequest().body(ex.message)
-        }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun remover(@PathVariable estadoId: Long) {
+        cadastroEstadoService.excluir(estadoId)
     }
 }

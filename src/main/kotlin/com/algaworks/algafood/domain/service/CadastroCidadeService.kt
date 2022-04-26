@@ -29,4 +29,10 @@ class CadastroCidadeService(
             throw EntidadeNaoEncontradaException("Não existe um cadastro de estado com código $cidadeId")
         }
     }
+
+    fun buscarOuFalhar(cidadeId: Long): Cidade {
+        return cidadeRepository.findById(cidadeId).orElseThrow {
+            EntidadeNaoEncontradaException("Não existe um cadastro de cidade com código $cidadeId")
+        }
+    }
 }
