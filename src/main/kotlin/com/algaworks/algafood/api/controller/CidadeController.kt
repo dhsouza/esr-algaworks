@@ -31,7 +31,7 @@ class CidadeController(
         try {
             return cadastroCidadeService.salvar(cidadeRequest)
         } catch (ex: EntidadeNaoEncontradaException) {
-            throw NegocioException(ex.mensagem)
+            throw NegocioException(ex.mensagem, ex)
         }
     }
 
@@ -45,7 +45,7 @@ class CidadeController(
         try {
             return cadastroCidadeService.salvar(cidade.copy(id = cidadeAtual.id))
         } catch (ex: EntidadeNaoEncontradaException) {
-            throw NegocioException(ex.mensagem)
+            throw NegocioException(ex.mensagem, ex)
         }
     }
 

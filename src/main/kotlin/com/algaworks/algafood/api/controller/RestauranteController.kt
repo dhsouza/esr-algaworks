@@ -50,7 +50,7 @@ class RestauranteController(
         try {
             return cadastroRestauranteService.salvar(restauranteRequest)
         } catch (ex: EntidadeNaoEncontradaException) {
-            throw NegocioException(ex.mensagem)
+            throw NegocioException(ex.mensagem, ex)
         }
     }
 
@@ -72,7 +72,7 @@ class RestauranteController(
                 )
             )
         } catch (ex: EntidadeNaoEncontradaException) {
-            throw NegocioException(ex.mensagem)
+            throw NegocioException(ex.mensagem, ex)
         }
     }
 

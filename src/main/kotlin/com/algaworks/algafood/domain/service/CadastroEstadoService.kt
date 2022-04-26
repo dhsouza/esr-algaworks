@@ -1,7 +1,7 @@
 package com.algaworks.algafood.domain.service
 
 import com.algaworks.algafood.domain.exceptions.EntidadeEmUsoException
-import com.algaworks.algafood.domain.exceptions.EntidadeNaoEncontradaException
+import com.algaworks.algafood.domain.exceptions.EstadoNaoEncontradoException
 import com.algaworks.algafood.domain.model.Estado
 import com.algaworks.algafood.domain.repository.EstadoRepository
 import org.springframework.dao.DataIntegrityViolationException
@@ -21,7 +21,7 @@ class CadastroEstadoService(
         try {
             estadoRepository.deleteById(estadoId)
         } catch (ex: EmptyResultDataAccessException) {
-            throw EntidadeNaoEncontradaException("Não existe um cadastro de estado com código $estadoId")
+            throw EstadoNaoEncontradoException(estadoId)
         } catch (ex: DataIntegrityViolationException) {
             throw EntidadeEmUsoException("Estado de código $estadoId não pode ser removida, pois está em uso")
         }
@@ -29,7 +29,7 @@ class CadastroEstadoService(
 
     fun buscarOuFalhar(estadoId: Long): Estado {
         return estadoRepository.findById(estadoId).orElseThrow {
-            EntidadeNaoEncontradaException("Não existe um cadastro de estado com código $estadoId")
+            EstadoNaoEncontradoException(estadoId)
         }
     }
 }

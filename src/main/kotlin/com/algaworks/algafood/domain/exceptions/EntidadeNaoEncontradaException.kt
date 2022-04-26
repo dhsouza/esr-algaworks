@@ -4,4 +4,4 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-data class EntidadeNaoEncontradaException(val mensagem: String) : RuntimeException(mensagem)
+open class EntidadeNaoEncontradaException(open val mensagem: String) : NegocioException(mensagem)
