@@ -26,4 +26,10 @@ class CadastroCozinhaService(
             throw EntidadeEmUsoException("Cozinha de código $cozinhaId não pode ser removida, pois está em uso")
         }
     }
+
+    fun buscarOuFalhar(cozinhaId: Long): Cozinha {
+        return cozinhaRepository.findById(cozinhaId).orElseThrow {
+            EntidadeNaoEncontradaException("Não existe um cadastro de cozinha com código $cozinhaId")
+        }
+    }
 }

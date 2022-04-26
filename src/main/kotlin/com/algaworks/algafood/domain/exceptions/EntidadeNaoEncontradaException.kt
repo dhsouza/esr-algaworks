@@ -1,9 +1,7 @@
 package com.algaworks.algafood.domain.exceptions
 
 import org.springframework.http.HttpStatus
-import org.springframework.web.server.ResponseStatusException
+import org.springframework.web.bind.annotation.ResponseStatus
 
-//@ResponseStatus(HttpStatus.NOT_FOUND)
-class EntidadeNaoEncontradaException(status: HttpStatus, mensagem: String) : ResponseStatusException(status, mensagem) {
-    constructor(mensagem: String) : this(HttpStatus.NOT_FOUND, mensagem)
-}
+@ResponseStatus(HttpStatus.NOT_FOUND)
+class EntidadeNaoEncontradaException(mensagem: String) : RuntimeException(mensagem)
