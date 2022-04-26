@@ -1,5 +1,7 @@
 package com.algaworks.algafood.api.controller
 
+import com.algaworks.algafood.domain.exceptions.EntidadeNaoEncontradaException
+import com.algaworks.algafood.domain.exceptions.NegocioException
 import com.algaworks.algafood.domain.model.Restaurante
 import com.algaworks.algafood.domain.repository.RestauranteRepository
 import com.algaworks.algafood.domain.service.CadastroRestauranteService
@@ -45,7 +47,11 @@ class RestauranteController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun adicionar(@RequestBody restauranteRequest: Restaurante): Restaurante {
-        return cadastroRestauranteService.salvar(restauranteRequest)
+        try {
+            return cadastroRestauranteService.salvar(restauranteRequest)
+        } catch (ex: EntidadeNaoEncontradaException) {
+            throw NegocioException(ex.mensagem)
+        }
     }
 
     @PutMapping("/{restauranteId}")
@@ -55,15 +61,19 @@ class RestauranteController(
     ): Restaurante {
         val restauranteAtual = cadastroRestauranteService.buscarOuFalhar(restauranteId)
 
-        return cadastroRestauranteService.salvar(
-            restaurante.copy(
-                id = restauranteAtual.id,
-                formasPagamento = restauranteAtual.formasPagamento,
-                endereco = restauranteAtual.endereco,
-                dataCadastro = restauranteAtual.dataCadastro,
-                produtos = restauranteAtual.produtos
+        try {
+            return cadastroRestauranteService.salvar(
+                restaurante.copy(
+                    id = restauranteAtual.id,
+                    formasPagamento = restauranteAtual.formasPagamento,
+                    endereco = restauranteAtual.endereco,
+                    dataCadastro = restauranteAtual.dataCadastro,
+                    produtos = restauranteAtual.produtos
+                )
             )
-        )
+        } catch (ex: EntidadeNaoEncontradaException) {
+            throw NegocioException(ex.mensagem)
+        }
     }
 
     @DeleteMapping("/{restauranteId}")
