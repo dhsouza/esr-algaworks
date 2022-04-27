@@ -1,6 +1,6 @@
 package com.algaworks.algafood.domain.service
 
-import com.algaworks.algafood.domain.exceptions.EntidadeNaoEncontradaException
+import com.algaworks.algafood.domain.exceptions.RestauranteNaoEncontradoException
 import com.algaworks.algafood.domain.model.Restaurante
 import com.algaworks.algafood.domain.repository.RestauranteRepository
 import org.springframework.dao.EmptyResultDataAccessException
@@ -25,13 +25,13 @@ class CadastroRestauranteService(
         try {
             restauranteRepository.deleteById(restauranteId)
         } catch (ex: EmptyResultDataAccessException) {
-            throw EntidadeNaoEncontradaException("Não existe um cadastro de restaurante com código $restauranteId")
+            throw RestauranteNaoEncontradoException(restauranteId)
         }
     }
 
     fun buscarOuFalhar(restauranteId: Long): Restaurante {
         return restauranteRepository.findById(restauranteId).orElseThrow {
-            EntidadeNaoEncontradaException("Não existe um cadastro de restaurante com código $restauranteId")
+            RestauranteNaoEncontradoException(restauranteId)
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.algaworks.algafood.domain.service
 
+import com.algaworks.algafood.domain.exceptions.CozinhaNaoEncontradaException
 import com.algaworks.algafood.domain.exceptions.EntidadeEmUsoException
-import com.algaworks.algafood.domain.exceptions.EntidadeNaoEncontradaException
 import com.algaworks.algafood.domain.model.Cozinha
 import com.algaworks.algafood.domain.repository.CozinhaRepository
 import org.springframework.dao.DataIntegrityViolationException
@@ -21,7 +21,7 @@ class CadastroCozinhaService(
         try {
             cozinhaRepository.deleteById(cozinhaId)
         } catch (ex: EmptyResultDataAccessException) {
-            throw EntidadeNaoEncontradaException("Não existe um cadastro de cozinha com código $cozinhaId")
+            throw CozinhaNaoEncontradaException(cozinhaId)
         } catch (ex: DataIntegrityViolationException) {
             throw EntidadeEmUsoException("Cozinha de código $cozinhaId não pode ser removida, pois está em uso")
         }
@@ -29,7 +29,7 @@ class CadastroCozinhaService(
 
     fun buscarOuFalhar(cozinhaId: Long): Cozinha {
         return cozinhaRepository.findById(cozinhaId).orElseThrow {
-            EntidadeNaoEncontradaException("Não existe um cadastro de cozinha com código $cozinhaId")
+            CozinhaNaoEncontradaException(cozinhaId)
         }
     }
 }

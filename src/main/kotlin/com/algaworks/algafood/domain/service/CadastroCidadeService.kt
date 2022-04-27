@@ -1,6 +1,6 @@
 package com.algaworks.algafood.domain.service
 
-import com.algaworks.algafood.domain.exceptions.EntidadeNaoEncontradaException
+import com.algaworks.algafood.domain.exceptions.CidadeNaoEncontradaException
 import com.algaworks.algafood.domain.model.Cidade
 import com.algaworks.algafood.domain.repository.CidadeRepository
 import org.springframework.dao.EmptyResultDataAccessException
@@ -23,13 +23,13 @@ class CadastroCidadeService(
         try {
             cidadeRepository.deleteById(cidadeId)
         } catch (ex: EmptyResultDataAccessException) {
-            throw EntidadeNaoEncontradaException("Não existe um cadastro de estado com código $cidadeId")
+            throw CidadeNaoEncontradaException(cidadeId)
         }
     }
 
     fun buscarOuFalhar(cidadeId: Long): Cidade {
         return cidadeRepository.findById(cidadeId).orElseThrow {
-            EntidadeNaoEncontradaException("Não existe um cadastro de cidade com código $cidadeId")
+            CidadeNaoEncontradaException(cidadeId)
         }
     }
 }
