@@ -1,12 +1,15 @@
 package com.algaworks.algafood.api.controller
 
+import com.algaworks.algafood.api.exceptionhandler.Problema
 import com.algaworks.algafood.domain.exceptions.EntidadeNaoEncontradaException
 import com.algaworks.algafood.domain.exceptions.NegocioException
 import com.algaworks.algafood.domain.model.Cidade
 import com.algaworks.algafood.domain.repository.CidadeRepository
 import com.algaworks.algafood.domain.service.CadastroCidadeService
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/cidades")
@@ -53,5 +56,21 @@ class CidadeController(
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun remover(@PathVariable cidadeId: Long) {
         cadastroCidadeService.excluir(cidadeId)
+    }
+
+    @ExceptionHandler(EntidadeNaoEncontradaException::class)
+    fun tratarEstadoNaoEncontradoException(ex: EntidadeNaoEncontradaException): ResponseEntity<*> {
+        val problema = Problema(dataHora = LocalDateTime.now(), mensagem = ex.mensagem)
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(problema)
+    }
+
+    @ExceptionHandler(NegocioException::class)
+    fun tratarNegocioException(ex: NegocioException): ResponseEntity<*> {
+        val problema = Problema(dataHora = LocalDateTime.now(), mensagem = ex.mensagem)
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(problema)
     }
 }
