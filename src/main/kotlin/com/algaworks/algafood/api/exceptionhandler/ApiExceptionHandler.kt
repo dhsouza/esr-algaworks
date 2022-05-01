@@ -6,6 +6,7 @@ import com.algaworks.algafood.domain.exceptions.NegocioException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.WebRequest
@@ -45,6 +46,20 @@ class ApiExceptioHandler : ResponseEntityExceptionHandler() {
         val problem = createProblemBuilder(status, problemType, detail)
 
         return handleExceptionInternal(ex, problem, HttpHeaders(), HttpStatus.BAD_REQUEST, request)
+    }
+
+    override fun handleHttpMessageNotReadable(
+        ex: HttpMessageNotReadableException,
+        headers: HttpHeaders,
+        status: HttpStatus,
+        request: WebRequest,
+    ): ResponseEntity<Any> {
+        val problemType = ProblemType.MENSAGEM_INCOMPREENSIVEL
+        val detail = "O corpo da requisição está inválido. Verifique erro de sintaxe."
+
+        val problem = createProblemBuilder(status, problemType, detail)
+
+        return handleExceptionInternal(ex, problem, HttpHeaders(), status, request)
     }
 
     override fun handleExceptionInternal(
