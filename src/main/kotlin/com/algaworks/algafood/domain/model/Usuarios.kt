@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
-class Usuario(
+data class Usuario(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private val id: Long?,

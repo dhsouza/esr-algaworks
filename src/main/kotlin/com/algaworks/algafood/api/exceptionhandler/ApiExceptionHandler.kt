@@ -11,13 +11,18 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import java.lang.Exception
-import java.time.LocalDateTime
 
 @ControllerAdvice
 class ApiExceptioHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(EntidadeNaoEncontradaException::class)
     fun tratarEstadoNaoEncontradoException(ex: EntidadeNaoEncontradaException, request: WebRequest): ResponseEntity<*> {
-        return handleExceptionInternal(ex, ex.mensagem, HttpHeaders(), HttpStatus.NOT_FOUND, request)
+        val status = HttpStatus.NOT_FOUND
+        val problemType = ProblemType.ENTIDADE_NAO_ENCONTRADA
+        val detail = ex.mensagem
+
+        val problem = createProblemBuilder(status, problemType, detail)
+
+        return handleExceptionInternal(ex, problem, HttpHeaders(), HttpStatus.NOT_FOUND, request)
     }
 
     @ExceptionHandler(NegocioException::class)
@@ -37,9 +42,31 @@ class ApiExceptioHandler : ResponseEntityExceptionHandler() {
         status: HttpStatus,
         request: WebRequest,
     ): ResponseEntity<Any> {
-        val mensagem = (body ?: status.reasonPhrase) as String
-        val problema = Problema(dataHora = LocalDateTime.now(), mensagem = mensagem)
 
-        return super.handleExceptionInternal(ex, problema, headers, status, request)
+        val problem: Any = if (body == null) {
+            Problem(
+                title = status.reasonPhrase,
+                status = status.value()
+            )
+        } else {
+            if (body is String) {
+                Problem(
+                    title = body,
+                    status = status.value()
+                )
+            } else {
+                body
+            }
+        }
+
+        return super.handleExceptionInternal(ex, problem, headers, status, request)
     }
+
+    fun createProblemBuilder(status: HttpStatus, problemType: ProblemType, detail: String) =
+        Problem(
+            title = problemType.title,
+            type = problemType.uri,
+            status = status.value(),
+            detail = detail
+        )
 }
