@@ -5,12 +5,17 @@ import com.algaworks.algafood.domain.exceptions.NegocioException
 import com.algaworks.algafood.domain.model.Restaurante
 import com.algaworks.algafood.domain.repository.RestauranteRepository
 import com.algaworks.algafood.domain.service.CadastroRestauranteService
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import org.springframework.core.NestedExceptionUtils
 import org.springframework.http.HttpStatus
+import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.http.server.ServletServerHttpRequest
 import org.springframework.util.ReflectionUtils
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
 import java.util.*
+import javax.servlet.http.HttpServletRequest
 
 @RestController
 @RequestMapping("/restaurantes")
@@ -86,24 +91,34 @@ class RestauranteController(
     fun atualizarParcial(
         @PathVariable restauranteId: Long,
         @RequestBody campos: Map<String, Any>,
+        request: HttpServletRequest
     ): Restaurante {
         val restauranteAtual = cadastroRestauranteService.buscarOuFalhar(restauranteId)
 
-        merge(campos, restauranteAtual)
+        merge(campos, restauranteAtual, request)
 
         return atualizar(restauranteId, restauranteAtual)
     }
 
-    private fun merge(dadosOrigem: Map<String, Any>, restauranteDestino: Restaurante) {
-        val restauranteOrigem = jacksonObjectMapper().convertValue(dadosOrigem, Restaurante::class.java)
+    private fun merge(dadosOrigem: Map<String, Any>, restauranteDestino: Restaurante, request: HttpServletRequest) {
+        val servletRequest = ServletServerHttpRequest(request)
 
-        dadosOrigem.forEach { (nomePropriedade) ->
-            val field = ReflectionUtils.findField(Restaurante::class.java, nomePropriedade)
-                ?: return@forEach
-            field.isAccessible = true
+        try {
+            val restauranteOrigem = jacksonObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, true)
+                .convertValue(dadosOrigem, Restaurante::class.java)
 
-            val novoValor = ReflectionUtils.getField(field, restauranteOrigem)
-            ReflectionUtils.setField(field, restauranteDestino, novoValor)
+            dadosOrigem.forEach { (nomePropriedade) ->
+                val field = ReflectionUtils.findField(Restaurante::class.java, nomePropriedade)
+                    ?: return@forEach
+                field.isAccessible = true
+
+                val novoValor = ReflectionUtils.getField(field, restauranteOrigem)
+                ReflectionUtils.setField(field, restauranteDestino, novoValor)
+            }
+        } catch (ex: IllegalArgumentException) {
+            val rootCause = NestedExceptionUtils.getRootCause(ex)
+            throw HttpMessageNotReadableException(ex.message!!, rootCause, servletRequest)
         }
     }
 }
