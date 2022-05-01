@@ -25,14 +25,26 @@ class ApiExceptioHandler : ResponseEntityExceptionHandler() {
         return handleExceptionInternal(ex, problem, HttpHeaders(), HttpStatus.NOT_FOUND, request)
     }
 
-    @ExceptionHandler(NegocioException::class)
-    fun tratarNegocioException(ex: NegocioException, request: WebRequest): ResponseEntity<*> {
-        return handleExceptionInternal(ex, ex.mensagem, HttpHeaders(), HttpStatus.BAD_REQUEST, request)
-    }
-
     @ExceptionHandler(EntidadeEmUsoException::class)
     fun tratarEntidadeEmUsoExceptionException(ex: EntidadeEmUsoException, request: WebRequest): ResponseEntity<*> {
-        return handleExceptionInternal(ex, ex.mensagem, HttpHeaders(), HttpStatus.BAD_REQUEST, request)
+        val status = HttpStatus.BAD_REQUEST
+        val problemType = ProblemType.ENTIDADE_EM_USO
+        val detail = ex.mensagem
+
+        val problem = createProblemBuilder(status, problemType, detail)
+
+        return handleExceptionInternal(ex, problem, HttpHeaders(), HttpStatus.BAD_REQUEST, request)
+    }
+
+    @ExceptionHandler(NegocioException::class)
+    fun tratarNegocioException(ex: NegocioException, request: WebRequest): ResponseEntity<*> {
+        val status = HttpStatus.BAD_REQUEST
+        val problemType = ProblemType.ERRO_NEGOCIO
+        val detail = ex.mensagem
+
+        val problem = createProblemBuilder(status, problemType, detail)
+
+        return handleExceptionInternal(ex, problem, HttpHeaders(), HttpStatus.BAD_REQUEST, request)
     }
 
     override fun handleExceptionInternal(
