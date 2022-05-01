@@ -3,7 +3,9 @@ package com.algaworks.algafood.api.exceptionhandler
 import com.algaworks.algafood.domain.exceptions.EntidadeEmUsoException
 import com.algaworks.algafood.domain.exceptions.EntidadeNaoEncontradaException
 import com.algaworks.algafood.domain.exceptions.NegocioException
+import com.fasterxml.jackson.databind.JsonMappingException.Reference
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
+import com.fasterxml.jackson.databind.exc.PropertyBindingException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -48,14 +50,29 @@ class ApiExceptioHandler : ResponseEntityExceptionHandler() {
         return handleExceptionInternal(ex, problem, HttpHeaders(), HttpStatus.BAD_REQUEST, request)
     }
 
-    private fun handleInvalidFormatException(ex: InvalidFormatException, headers: HttpHeaders, status: HttpStatus, request: WebRequest): ResponseEntity<Any> {
-        val path = ex.path.joinToString(separator = ".") { ref ->
+    private fun List<Reference>.joinPath(): String {
+        return this.joinToString(separator = ".") { ref ->
             ref.fieldName
         }
+    }
+
+    private fun handleInvalidFormatException(ex: InvalidFormatException, headers: HttpHeaders, status: HttpStatus, request: WebRequest): ResponseEntity<Any> {
+        val path = ex.path.joinPath()
 
         val problemType = ProblemType.MENSAGEM_INCOMPREENSIVEL
         val detail = "A propriedade $path recebeu o valor ${ex.value} que é de um tipo inválido. " +
                 "Corrija e informe um valor compatível com o tipo ${ex.targetType.simpleName}"
+
+        val problem = createProblemBuilder(status, problemType, detail)
+
+        return handleExceptionInternal(ex, problem, headers, status, request)
+    }
+
+    private fun handlePropertyBindingException(ex: PropertyBindingException, headers: HttpHeaders, status: HttpStatus, request: WebRequest): ResponseEntity<Any> {
+        val path = ex.path.joinPath()
+
+        val problemType = ProblemType.MENSAGEM_INCOMPREENSIVEL
+        val detail = "A propriedade $path não existe. Corrija ou remova essa propriedade e tente novamente"
 
         val problem = createProblemBuilder(status, problemType, detail)
 
@@ -71,6 +88,8 @@ class ApiExceptioHandler : ResponseEntityExceptionHandler() {
         val rootCause = ex.rootCause
         if (rootCause is InvalidFormatException) {
             return handleInvalidFormatException(rootCause, headers, status, request)
+        } else if (rootCause is PropertyBindingException) {
+            return handlePropertyBindingException(rootCause, headers, status, request)
         }
 
         val problemType = ProblemType.MENSAGEM_INCOMPREENSIVEL
