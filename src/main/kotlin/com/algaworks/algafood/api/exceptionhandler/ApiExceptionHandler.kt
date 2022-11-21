@@ -6,6 +6,7 @@ import com.algaworks.algafood.domain.exceptions.NegocioException
 import com.fasterxml.jackson.databind.JsonMappingException.Reference
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.databind.exc.PropertyBindingException
+import org.springframework.beans.TypeMismatchException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -13,6 +14,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.WebRequest
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 @ControllerAdvice
@@ -79,6 +81,31 @@ class ApiExceptioHandler : ResponseEntityExceptionHandler() {
         return handleExceptionInternal(ex, problem, headers, status, request)
     }
 
+    private fun createProblemBuilder(status: HttpStatus, problemType: ProblemType, detail: String) =
+        Problem(
+            title = problemType.title,
+            type = problemType.uri,
+            status = status.value(),
+            detail = detail
+        )
+
+    private fun handleMethodArgumentTypeMismatch(
+        ex: MethodArgumentTypeMismatchException,
+        headers: HttpHeaders,
+        status: HttpStatus,
+        request: WebRequest,
+    ): ResponseEntity<Any> {
+        val problemType = ProblemType.PARAMETRO_INVALIDO
+
+        val detail = "O parâmetro de URL ${ex.name} recebeu o valor ${ex.value}, " +
+                "que é de um tipo inválido. Corrija e informe um valor compatível " +
+                "com o tipo ${ex.requiredType?.simpleName}"
+
+        val problem: Problem = createProblemBuilder(status, problemType, detail)
+
+        return handleExceptionInternal(ex, problem, headers, status, request)
+    }
+
     override fun handleHttpMessageNotReadable(
         ex: HttpMessageNotReadableException,
         headers: HttpHeaders,
@@ -98,6 +125,20 @@ class ApiExceptioHandler : ResponseEntityExceptionHandler() {
         val problem = createProblemBuilder(status, problemType, detail)
 
         return handleExceptionInternal(ex, problem, HttpHeaders(), status, request)
+    }
+
+    override fun handleTypeMismatch(
+        ex: TypeMismatchException,
+        headers: HttpHeaders,
+        status: HttpStatus,
+        request: WebRequest,
+    ): ResponseEntity<Any> {
+
+        return if (ex is MethodArgumentTypeMismatchException) {
+            handleMethodArgumentTypeMismatch(ex, headers, status, request)
+        } else {
+            super.handleTypeMismatch(ex, headers, status, request)
+        }
     }
 
     override fun handleExceptionInternal(
@@ -126,12 +167,4 @@ class ApiExceptioHandler : ResponseEntityExceptionHandler() {
 
         return super.handleExceptionInternal(ex, problem, headers, status, request)
     }
-
-    fun createProblemBuilder(status: HttpStatus, problemType: ProblemType, detail: String) =
-        Problem(
-            title = problemType.title,
-            type = problemType.uri,
-            status = status.value(),
-            detail = detail
-        )
 }
