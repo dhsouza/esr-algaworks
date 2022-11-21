@@ -21,6 +21,21 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 class ApiExceptioHandler : ResponseEntityExceptionHandler() {
+
+    @ExceptionHandler(Exception::class)
+    fun handleUncaught(ex: Exception, request: WebRequest): ResponseEntity<Any> {
+        val status = HttpStatus.INTERNAL_SERVER_ERROR
+        val problemType = ProblemType.ERRO_DE_SISTEMA
+        val detail = ("Ocorreu um erro interno inesperado no sistema. Tente novamente e se o problema " +
+                "persistir, entre em contato com o administrador do sistema.")
+
+        // printStackTrace temporário até implementação de log
+        ex.printStackTrace()
+
+        val problem: Problem = createProblemBuilder(status, problemType, detail)
+        return handleExceptionInternal(ex, problem, HttpHeaders(), status, request)
+    }
+
     @ExceptionHandler(EntidadeNaoEncontradaException::class)
     fun tratarEstadoNaoEncontradoException(ex: EntidadeNaoEncontradaException, request: WebRequest): ResponseEntity<*> {
         val status = HttpStatus.NOT_FOUND
