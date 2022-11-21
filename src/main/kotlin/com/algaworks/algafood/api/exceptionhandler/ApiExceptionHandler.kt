@@ -191,13 +191,15 @@ class ApiExceptioHandler : ResponseEntityExceptionHandler() {
         val problem: Any = if (body == null) {
             Problem(
                 title = status.reasonPhrase,
-                status = status.value()
+                status = status.value(),
+                userMessage = MSG_ERRO_GENERICO_USUARIO_FINAL
             )
         } else {
             if (body is String) {
                 Problem(
                     title = body,
-                    status = status.value()
+                    status = status.value(),
+                    userMessage = MSG_ERRO_GENERICO_USUARIO_FINAL
                 )
             } else {
                 body
