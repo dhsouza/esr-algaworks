@@ -15,14 +15,16 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
+import org.springframework.web.servlet.NoHandlerFoundException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
+
 
 @ControllerAdvice
 class ApiExceptioHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(EntidadeNaoEncontradaException::class)
     fun tratarEstadoNaoEncontradoException(ex: EntidadeNaoEncontradaException, request: WebRequest): ResponseEntity<*> {
         val status = HttpStatus.NOT_FOUND
-        val problemType = ProblemType.ENTIDADE_NAO_ENCONTRADA
+        val problemType = ProblemType.RECURSO_NAO_ENCONTRADO
         val detail = ex.mensagem
 
         val problem = createProblemBuilder(status, problemType, detail)
@@ -139,6 +141,19 @@ class ApiExceptioHandler : ResponseEntityExceptionHandler() {
         } else {
             super.handleTypeMismatch(ex, headers, status, request)
         }
+    }
+
+    override fun handleNoHandlerFoundException(
+        ex: NoHandlerFoundException,
+        headers: HttpHeaders,
+        status: HttpStatus,
+        request: WebRequest,
+    ): ResponseEntity<Any> {
+        val problemType = ProblemType.RECURSO_NAO_ENCONTRADO
+        val detail = "O recurso ${ex.requestURL}, que você tentou acessar, é inexistente."
+
+        val problem: Problem = createProblemBuilder(status, problemType, detail)
+        return handleExceptionInternal(ex, problem, headers, status, request)
     }
 
     override fun handleExceptionInternal(
