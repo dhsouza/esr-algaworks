@@ -8,4 +8,5 @@ data class Problem(
     val type: String? = null,
     val status: Int,
     val detail: String? = null,
+    val userMessage: String? = null
 )

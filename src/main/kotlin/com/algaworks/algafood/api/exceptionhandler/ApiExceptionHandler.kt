@@ -19,6 +19,10 @@ import org.springframework.web.servlet.NoHandlerFoundException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 
+private const val MSG_ERRO_GENERICO_USUARIO_FINAL = "Ocorreu um erro interno inesperado no sistema. " +
+        "Tente novamente e se o problema " +
+        "persistir, entre em contato com o administrador do sistema."
+
 @ControllerAdvice
 class ApiExceptioHandler : ResponseEntityExceptionHandler() {
 
@@ -26,8 +30,7 @@ class ApiExceptioHandler : ResponseEntityExceptionHandler() {
     fun handleUncaught(ex: Exception, request: WebRequest): ResponseEntity<Any> {
         val status = HttpStatus.INTERNAL_SERVER_ERROR
         val problemType = ProblemType.ERRO_DE_SISTEMA
-        val detail = ("Ocorreu um erro interno inesperado no sistema. Tente novamente e se o problema " +
-                "persistir, entre em contato com o administrador do sistema.")
+        val detail = MSG_ERRO_GENERICO_USUARIO_FINAL
 
         // printStackTrace temporário até implementação de log
         ex.printStackTrace()
@@ -82,7 +85,7 @@ class ApiExceptioHandler : ResponseEntityExceptionHandler() {
         val detail = "A propriedade $path recebeu o valor ${ex.value} que é de um tipo inválido. " +
                 "Corrija e informe um valor compatível com o tipo ${ex.targetType.simpleName}"
 
-        val problem = createProblemBuilder(status, problemType, detail)
+        val problem = createProblemBuilder(status, problemType, detail, MSG_ERRO_GENERICO_USUARIO_FINAL)
 
         return handleExceptionInternal(ex, problem, headers, status, request)
     }
@@ -93,17 +96,23 @@ class ApiExceptioHandler : ResponseEntityExceptionHandler() {
         val problemType = ProblemType.MENSAGEM_INCOMPREENSIVEL
         val detail = "A propriedade $path não existe. Corrija ou remova essa propriedade e tente novamente"
 
-        val problem = createProblemBuilder(status, problemType, detail)
+        val problem = createProblemBuilder(status, problemType, detail, MSG_ERRO_GENERICO_USUARIO_FINAL)
 
         return handleExceptionInternal(ex, problem, headers, status, request)
     }
 
-    private fun createProblemBuilder(status: HttpStatus, problemType: ProblemType, detail: String) =
+    private fun createProblemBuilder(
+        status: HttpStatus,
+        problemType: ProblemType,
+        detail: String,
+        userMessage: String? = null,
+    ) =
         Problem(
             title = problemType.title,
             type = problemType.uri,
             status = status.value(),
-            detail = detail
+            detail = detail,
+            userMessage = userMessage ?: detail
         )
 
     private fun handleMethodArgumentTypeMismatch(
