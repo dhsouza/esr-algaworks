@@ -6,6 +6,10 @@ import org.hibernate.annotations.UpdateTimestamp
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.persistence.*
+import javax.validation.Valid
+import javax.validation.constraints.DecimalMin
+import javax.validation.constraints.NotBlank
+import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.NotNull
 
 @Entity
@@ -14,13 +18,16 @@ data class Restaurante(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long?,
 
-    @field:NotNull
+    @field:NotBlank
     @Column(nullable = false)
-    val nome: String?,
+    val nome: String,
 
+    @field:DecimalMin(value = "1")
     @Column(name = "taxa_frete")
     val taxaFrete: BigDecimal?,
 
+    @field:Valid
+    @field:NotNull
     @ManyToOne
     @JoinColumn(name = "cozinha_id", nullable = false)
     val cozinha: Cozinha?,
