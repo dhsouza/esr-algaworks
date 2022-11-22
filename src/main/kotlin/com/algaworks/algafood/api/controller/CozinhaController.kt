@@ -5,6 +5,7 @@ import com.algaworks.algafood.domain.repository.CozinhaRepository
 import com.algaworks.algafood.domain.service.CadastroCozinhaService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/cozinhas")
@@ -25,7 +26,7 @@ class CozinhaController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun adicionar(@RequestBody cozinha: Cozinha): Cozinha {
+    fun adicionar(@RequestBody @Valid cozinha: Cozinha): Cozinha {
         return cadastroCozinhaService.salvar(cozinha)
     }
 
