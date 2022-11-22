@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.WebRequest
@@ -106,13 +107,15 @@ class ApiExceptioHandler : ResponseEntityExceptionHandler() {
         problemType: ProblemType,
         detail: String,
         userMessage: String? = null,
+        problemFields: List<Problem.Field> = listOf()
     ) =
         Problem(
             title = problemType.title,
             type = problemType.uri,
             status = status.value(),
             detail = detail,
-            userMessage = userMessage ?: detail
+            userMessage = userMessage ?: detail,
+            fields = problemFields
         )
 
     private fun handleMethodArgumentTypeMismatch(
@@ -177,6 +180,33 @@ class ApiExceptioHandler : ResponseEntityExceptionHandler() {
         val detail = "O recurso ${ex.requestURL}, que você tentou acessar, é inexistente."
 
         val problem: Problem = createProblemBuilder(status, problemType, detail)
+        return handleExceptionInternal(ex, problem, headers, status, request)
+    }
+
+    override fun handleMethodArgumentNotValid(
+        ex: MethodArgumentNotValidException,
+        headers: HttpHeaders,
+        status: HttpStatus,
+        request: WebRequest
+    ): ResponseEntity<Any> {
+        val problemType = ProblemType.DADOS_INVALIDOS
+        val detail = "Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente."
+
+        val bindingResult = ex.bindingResult
+        val problemFields = bindingResult.fieldErrors.map { fieldError ->
+            Problem.Field(
+                name = fieldError.field,
+                userMessage = fieldError.defaultMessage ?: "Campo inválido - defaultMessage vazio"
+            )
+        }
+
+        val problem: Problem = createProblemBuilder(
+            status = status,
+            problemType = problemType,
+            detail = detail,
+            problemFields = problemFields
+        )
+
         return handleExceptionInternal(ex, problem, headers, status, request)
     }
 

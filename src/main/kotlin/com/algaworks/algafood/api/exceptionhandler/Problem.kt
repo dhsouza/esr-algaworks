@@ -10,5 +10,8 @@ data class Problem(
     val status: Int,
     val detail: String? = null,
     val userMessage: String? = null,
-    val timestamp: LocalDateTime = LocalDateTime.now()
-)
+    val timestamp: LocalDateTime = LocalDateTime.now(),
+    val fields: List<Field> = listOf()
+) {
+    data class Field (val name: String, val userMessage: String)
+}
