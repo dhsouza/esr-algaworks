@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
 import java.util.*
 import javax.servlet.http.HttpServletRequest
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/restaurantes")
@@ -51,7 +52,7 @@ class RestauranteController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun adicionar(@RequestBody restauranteRequest: Restaurante): Restaurante {
+    fun adicionar(@RequestBody @Valid restauranteRequest: Restaurante): Restaurante {
         try {
             return cadastroRestauranteService.salvar(restauranteRequest)
         } catch (ex: EntidadeNaoEncontradaException) {

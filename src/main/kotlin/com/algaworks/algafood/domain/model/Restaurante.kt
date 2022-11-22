@@ -6,6 +6,7 @@ import org.hibernate.annotations.UpdateTimestamp
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.persistence.*
+import javax.validation.constraints.NotNull
 
 @Entity
 data class Restaurante(
@@ -13,6 +14,8 @@ data class Restaurante(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long?,
 
+    @field:NotNull
+    @Column(nullable = false)
     val nome: String?,
 
     @Column(name = "taxa_frete")
