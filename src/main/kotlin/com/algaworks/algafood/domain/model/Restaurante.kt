@@ -20,6 +20,7 @@ data class Restaurante(
     @Column(nullable = false)
     val nome: String?,
 
+    @field:NotNull
     @field:PositiveOrZero
     @Column(name = "taxa_frete")
     val taxaFrete: BigDecimal?,
