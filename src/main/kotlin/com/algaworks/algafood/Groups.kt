@@ -1,5 +1,5 @@
 package com.algaworks.algafood
 
 interface Groups {
-    interface CadastroRestaurante
+    interface CozinhaId
 }

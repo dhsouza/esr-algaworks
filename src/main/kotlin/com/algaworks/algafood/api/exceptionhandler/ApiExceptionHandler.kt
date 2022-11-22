@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.JsonMappingException.Reference
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.databind.exc.PropertyBindingException
 import org.springframework.beans.TypeMismatchException
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -25,7 +27,9 @@ private const val MSG_ERRO_GENERICO_USUARIO_FINAL = "Ocorreu um erro interno ine
         "persistir, entre em contato com o administrador do sistema."
 
 @ControllerAdvice
-class ApiExceptioHandler : ResponseEntityExceptionHandler() {
+class ApiExceptioHandler(
+    val messageSource: MessageSource
+) : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(Exception::class)
     fun handleUncaught(ex: Exception, request: WebRequest): ResponseEntity<Any> {
@@ -194,9 +198,12 @@ class ApiExceptioHandler : ResponseEntityExceptionHandler() {
 
         val bindingResult = ex.bindingResult
         val problemFields = bindingResult.fieldErrors.map { fieldError ->
+
+            val message = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale())
+
             Problem.Field(
                 name = fieldError.field,
-                userMessage = fieldError.defaultMessage ?: "Campo inválido - defaultMessage vazio"
+                userMessage = message
             )
         }
 

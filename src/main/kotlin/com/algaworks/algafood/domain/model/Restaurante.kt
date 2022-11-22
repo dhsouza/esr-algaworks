@@ -1,16 +1,12 @@
 package com.algaworks.algafood.domain.model
 
-import com.algaworks.algafood.Groups
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.persistence.*
-import javax.validation.Valid
-import javax.validation.constraints.DecimalMin
 import javax.validation.constraints.NotBlank
-import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.PositiveOrZero
 
@@ -20,16 +16,15 @@ data class Restaurante(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long?,
 
-    @field:NotBlank(groups = [Groups.CadastroRestaurante::class])
+    @field:NotBlank
     @Column(nullable = false)
-    val nome: String,
+    val nome: String?,
 
-    @field:PositiveOrZero(groups = [Groups.CadastroRestaurante::class])
+    @field:PositiveOrZero
     @Column(name = "taxa_frete")
     val taxaFrete: BigDecimal?,
 
-    @field:Valid
-    @field:NotNull(groups = [Groups.CadastroRestaurante::class])
+    @field:NotNull
     @ManyToOne
     @JoinColumn(name = "cozinha_id", nullable = false)
     val cozinha: Cozinha?,
