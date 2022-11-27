@@ -3,6 +3,7 @@ package com.algaworks.algafood.api.exceptionhandler
 import com.algaworks.algafood.domain.exceptions.EntidadeEmUsoException
 import com.algaworks.algafood.domain.exceptions.EntidadeNaoEncontradaException
 import com.algaworks.algafood.domain.exceptions.NegocioException
+import com.algaworks.algafood.domain.exceptions.ValidacaoException
 import com.fasterxml.jackson.databind.JsonMappingException.Reference
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.databind.exc.PropertyBindingException
@@ -13,6 +14,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.validation.BindingResult
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -77,6 +79,11 @@ class ApiExceptioHandler(
         return handleExceptionInternal(ex, problem, HttpHeaders(), HttpStatus.BAD_REQUEST, request)
     }
 
+    @ExceptionHandler(ValidacaoException::class)
+    fun tratarValidacaoException(ex: ValidacaoException, request: WebRequest): ResponseEntity<*> {
+        return handleValidationInternal(ex, ex.bindingResult, HttpHeaders(), HttpStatus.BAD_REQUEST, request)
+    }
+
     private fun List<Reference>.joinPath(): String {
         return this.joinToString(separator = ".") { ref ->
             ref.fieldName
@@ -139,6 +146,37 @@ class ApiExceptioHandler(
         return handleExceptionInternal(ex, problem, headers, status, request)
     }
 
+    private fun handleValidationInternal(
+        ex: Exception,
+        bindingResult: BindingResult,
+        headers: HttpHeaders,
+        status: HttpStatus,
+        request: WebRequest
+    ): ResponseEntity<Any> {
+        val problemType = ProblemType.DADOS_INVALIDOS
+        val detail = "Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente."
+
+        val bindingResult = bindingResult
+        val problemFields = bindingResult.fieldErrors.map { fieldError ->
+
+            val message = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale())
+
+            Problem.Field(
+                name = fieldError.field,
+                userMessage = message
+            )
+        }
+
+        val problem: Problem = createProblemBuilder(
+            status = status,
+            problemType = problemType,
+            detail = detail,
+            problemFields = problemFields
+        )
+
+        return handleExceptionInternal(ex, problem, headers, status, request)
+    }
+
     override fun handleHttpMessageNotReadable(
         ex: HttpMessageNotReadableException,
         headers: HttpHeaders,
@@ -193,28 +231,7 @@ class ApiExceptioHandler(
         status: HttpStatus,
         request: WebRequest
     ): ResponseEntity<Any> {
-        val problemType = ProblemType.DADOS_INVALIDOS
-        val detail = "Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente."
-
-        val bindingResult = ex.bindingResult
-        val problemFields = bindingResult.fieldErrors.map { fieldError ->
-
-            val message = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale())
-
-            Problem.Field(
-                name = fieldError.field,
-                userMessage = message
-            )
-        }
-
-        val problem: Problem = createProblemBuilder(
-            status = status,
-            problemType = problemType,
-            detail = detail,
-            problemFields = problemFields
-        )
-
-        return handleExceptionInternal(ex, problem, headers, status, request)
+        return handleValidationInternal(ex, ex.bindingResult, headers, status, request)
     }
 
     override fun handleExceptionInternal(
