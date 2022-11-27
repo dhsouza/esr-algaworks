@@ -2,6 +2,7 @@ package com.algaworks.algafood.api.controller
 
 import com.algaworks.algafood.domain.exceptions.EntidadeNaoEncontradaException
 import com.algaworks.algafood.domain.exceptions.NegocioException
+import com.algaworks.algafood.domain.exceptions.ValidacaoException
 import com.algaworks.algafood.domain.model.Restaurante
 import com.algaworks.algafood.domain.repository.RestauranteRepository
 import com.algaworks.algafood.domain.service.CadastroRestauranteService
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.http.server.ServletServerHttpRequest
 import org.springframework.util.ReflectionUtils
+import org.springframework.validation.BeanPropertyBindingResult
+import org.springframework.validation.SmartValidator
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
 import java.util.*
@@ -23,6 +26,7 @@ import javax.validation.Valid
 class RestauranteController(
     private val restauranteRepository: RestauranteRepository,
     private val cadastroRestauranteService: CadastroRestauranteService,
+    private val validator: SmartValidator
 ) {
 
     @GetMapping
@@ -97,8 +101,18 @@ class RestauranteController(
         val restauranteAtual = cadastroRestauranteService.buscarOuFalhar(restauranteId)
 
         merge(campos, restauranteAtual, request)
+        validate(restauranteAtual, "restaurante")
 
         return atualizar(restauranteId, restauranteAtual)
+    }
+
+    private fun validate(restaurante: Restaurante, objectName: String) {
+        val bindingResult = BeanPropertyBindingResult(restaurante, objectName)
+        validator.validate(restaurante, bindingResult)
+
+        if (bindingResult.hasErrors()) {
+            throw ValidacaoException(bindingResult)
+        }
     }
 
     private fun merge(dadosOrigem: Map<String, Any>, restauranteDestino: Restaurante, request: HttpServletRequest) {
