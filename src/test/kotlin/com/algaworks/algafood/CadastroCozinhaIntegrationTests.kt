@@ -1,5 +1,7 @@
 package com.algaworks.algafood
 
+import com.algaworks.algafood.domain.exceptions.CozinhaNaoEncontradaException
+import com.algaworks.algafood.domain.exceptions.EntidadeEmUsoException
 import com.algaworks.algafood.domain.model.Cozinha
 import com.algaworks.algafood.domain.service.CadastroCozinhaService
 import org.assertj.core.api.Assertions.assertThat
@@ -16,7 +18,7 @@ class CadastroCozinhaIntegrationTests {
 	private lateinit var cadastroCozinha: CadastroCozinhaService
 
 	@Test
-	fun `testar cadastro cozinha com sucesso`() {
+	fun `when saving cozinha with correct data should assign an id`() {
 		//cenário
 		var novaCozinha = Cozinha(
 			id = null,
@@ -33,7 +35,7 @@ class CadastroCozinhaIntegrationTests {
 	}
 
 	@Test
-	fun `deve falhar ao cadastrar cozinha sem nome`() {
+	fun `should fail when saving a cozinha without name`() {
 		val novaCozinha = Cozinha(
 			id = null,
 			nome = null,
@@ -42,6 +44,20 @@ class CadastroCozinhaIntegrationTests {
 
 		assertThrows<ConstraintViolationException> {
 			cadastroCozinha.salvar(novaCozinha)
+		}
+	}
+
+	@Test
+	fun `should fail when deleting a cozinha that's already in use`() {
+		assertThrows<EntidadeEmUsoException> {
+			cadastroCozinha.excluir(1L)
+		}
+	}
+
+	@Test
+	fun `should fail when deleting a non existent cozinha`() {
+		assertThrows<CozinhaNaoEncontradaException> {
+			cadastroCozinha.excluir(100L)
 		}
 	}
 }
