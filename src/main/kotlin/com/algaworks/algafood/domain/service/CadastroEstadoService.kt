@@ -7,16 +7,19 @@ import com.algaworks.algafood.domain.repository.EstadoRepository
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CadastroEstadoService(
     private val estadoRepository: EstadoRepository
 ) {
 
+    @Transactional
     fun salvar(estado: Estado): Estado {
         return estadoRepository.save(estado)
     }
 
+    @Transactional
     fun excluir(estadoId: Long) {
         try {
             estadoRepository.deleteById(estadoId)

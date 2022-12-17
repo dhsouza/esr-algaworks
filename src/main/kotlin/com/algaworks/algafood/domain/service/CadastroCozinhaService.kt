@@ -7,16 +7,19 @@ import com.algaworks.algafood.domain.repository.CozinhaRepository
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CadastroCozinhaService(
     private val cozinhaRepository: CozinhaRepository
 ) {
 
+    @Transactional
     fun salvar(cozinha: Cozinha): Cozinha {
         return cozinhaRepository.save(cozinha)
     }
 
+    @Transactional
     fun excluir(cozinhaId: Long) {
         try {
             cozinhaRepository.deleteById(cozinhaId)
