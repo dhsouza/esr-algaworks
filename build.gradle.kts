@@ -30,6 +30,7 @@ dependencies {
     implementation("mysql:mysql-connector-java")
     implementation("org.flywaydb:flyway-core")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
+    testImplementation("io.rest-assured:rest-assured")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 

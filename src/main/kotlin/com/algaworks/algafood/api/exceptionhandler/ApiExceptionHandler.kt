@@ -156,7 +156,6 @@ class ApiExceptioHandler(
         val problemType = ProblemType.DADOS_INVALIDOS
         val detail = "Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente."
 
-        val bindingResult = bindingResult
         val problemFields = bindingResult.fieldErrors.map { fieldError ->
 
             val message = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale())
